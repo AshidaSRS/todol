@@ -29,30 +29,36 @@ var __importStar = (this && this.__importStar) || function (mod) {
     __setModuleDefault(result, mod);
     return result;
 };
-var __importDefault = (this && this.__importDefault) || function (mod) {
-    return (mod && mod.__esModule) ? mod : { "default": mod };
+var __spreadArray = (this && this.__spreadArray) || function (to, from) {
+    for (var i = 0, il = from.length, j = to.length; i < il; i++, j++)
+        to[j] = from[i];
+    return to;
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.print = void 0;
 var _ = __importStar(require("lodash/fp"));
-var treeify_1 = __importDefault(require("treeify"));
 var tab = function (n, v) {
     if (n === void 0) { n = 1; }
     return _.repeat(n)('\t') + " " + (v ? v : '');
 };
 var print = function (tree) {
-    console.log(printTree(tree));
+    var t = printTree(tree);
+    p(printTree2(tree));
+    //console.log(treeify.asTree(t, false, true))
+    //console.log(JSON.stringify(printTree2(tree), undefined, 2))
 };
 exports.print = print;
 var printTree = function (tree) {
     var _a, _b;
     if (tree.type === 'directory' && tree.children) {
         var result = (_a = {}, _a[tree.name] = printNodeChildren(tree.children), _a);
-        return treeify_1.default.asTree(result, false, true);
+        //return treeify.asTree(result, false, true)
+        return result;
     }
     else {
         var result = (_b = {}, _b[tree.name] = "", _b);
-        return treeify_1.default.asTree(result, false, true);
+        //return treeify.asTree(result, false, true)
+        return result;
     }
 };
 var printNodeChildren = function (listTree) {
@@ -65,4 +71,75 @@ var printNodeChildren = function (listTree) {
             return __assign(__assign({}, acc), (_b = {}, _b[t.name] = "", _b));
         }
     }, {});
+};
+var printTree2 = function (tree) {
+    if (tree.type === 'directory' && tree.children) {
+        var node = {
+            name: tree.name,
+            isLast: false,
+            children: printNodeChildren2(tree.children, 0),
+            deep: 0,
+        };
+        //return treeify.asTree(result, false, true)
+        return { root: node };
+    }
+    else {
+        var node = {
+            name: tree.name,
+            isLast: true,
+            deep: 0,
+            children: []
+        };
+        return { root: node };
+    }
+};
+var printNodeChildren2 = function (listTree, parentDeep) {
+    var lastChildren = _.last(listTree);
+    return listTree.reduce(function (acc, t) {
+        var node = {
+            name: t.name,
+            isLast: (lastChildren === null || lastChildren === void 0 ? void 0 : lastChildren.name) === t.name ? true : false,
+            deep: parentDeep + 1,
+            children: []
+        };
+        if (t.type === 'directory' && t.children) {
+            var result = __assign(__assign({}, node), { children: printNodeChildren2(t.children || [], parentDeep + 1) });
+            return __spreadArray(__spreadArray([], acc), [result]);
+        }
+        else {
+            return __spreadArray(__spreadArray([], acc), [__assign(__assign({}, node), { isLast: true, deep: parentDeep + 1 })]);
+        }
+    }, []);
+};
+var p = function (tree) {
+    var _a = tree.root, name = _a.name, deep = _a.deep, isLast = _a.isLast, children = _a.children;
+    if (isLast) {
+        p2(name, deep, isLast);
+    }
+    else {
+        p2(name, deep, isLast);
+        pc(children);
+    }
+};
+var pc = function (children) {
+    children.map(function (c) {
+        if (c.isLast) {
+            p2(c.name, c.deep, c.isLast);
+            if (c.children) {
+                pc(c.children);
+            }
+        }
+        else {
+            p2(c.name, c.deep, c.isLast);
+            pc(c.children);
+        }
+    });
+};
+var p2 = function (name, deep, isLast) {
+    if (isLast) {
+        console.log(tab(deep - 2), tab(1, "|"), tab(1), "└", name);
+    }
+    else {
+        console.log(_.repeat(deep - 1)(tab(1, "|")), name);
+    }
 };
