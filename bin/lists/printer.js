@@ -11,7 +11,6 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.print = void 0;
 var node_emoji_1 = __importDefault(require("node-emoji"));
 var tree_1 = require("../tree");
-//var tree = require('../tree.js'); // Magic
 var print = function (tree, useColor) {
     if (useColor === void 0) { useColor = true; }
     console.log(tree_1.tree(useColor)(buildTreeFromDirectory(tree)));

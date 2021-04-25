@@ -1,19 +1,23 @@
-export interface Tree {
-    [k: string]: TreeNode
+import { ParseError } from '../types/errors'
+
+export type TodoType = 'todo' | 'subtodo' | 'check'
+
+export interface TODO {
+    name: string
+    children: {}[]
+    checkItems: {}[]
+    childrenDone: number
+    childrenTotal: number
+    done: boolean
 }
 
-export type TreeNode = undefined | Tree | null
-
-export const isTree = (o: TreeNode): o is Tree => !!o
-
-
-export interface Tree2 {
-    root: TreeNodeInfo,
+export type ParserResult = {
+    list: TODO | undefined,
+    errors: ParseError[] | undefined
 }
 
-export interface TreeNodeInfo {
-    isLast: boolean,
-    name: string,
-    deep: number,
-    children: TreeNodeInfo[]
+export interface TodolOptions {
+    autoCommitPush: boolean
+    commitMessage: string
+    rememberLastList: boolean
 }
